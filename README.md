@@ -23,16 +23,14 @@
 *Beautiful landing page with animated background and glass morphism effects*
 
 ### Curriculum View
-![Curriculum View](./screenshots/curriculum-view.png)
+<img width="1919" height="937" alt="image" src="https://github.com/user-attachments/assets/64b42ff8-40c9-4f1c-ad6f-e71ebc8de012" />
+
 *Interactive curriculum map showing all lessons and your progress*
 
 ### Workspace
-![Workspace](./screenshots/workspace.png)
-*Interactive workspace with Git canvas visualization, terminal, and guide panel*
+<img width="1919" height="942" alt="image" src="https://github.com/user-attachments/assets/0b6060d8-d6ec-4e41-b78c-1a5828a391ed" />
 
-### Lesson Completion
-![Lesson Completion](./screenshots/lesson-completion.png)
-*Celebration animation when completing lessons*
+*Interactive workspace with Git canvas visualization, terminal, and guide panel*
 
 ---
 
