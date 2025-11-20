@@ -18,7 +18,8 @@
 ## 📸 Screenshots
 
 ### Landing Page
-![Landing Page](./screenshots/landing-page.png)
+<img width="1919" height="938" alt="image" src="https://github.com/user-attachments/assets/cf722aca-4069-4948-b390-271b16c658cb" />
+
 *Beautiful landing page with animated background and glass morphism effects*
 
 ### Curriculum View
