@@ -27,7 +27,6 @@ Let’s be real—staring at a black-and-white terminal trying to visualize a `g
 From **"I deleted main by accident"** (Level 1) to **"I rewrite history for fun"** (Level 3) — we got you.
 
 ### 📸 The Landing Zone
-![Landing Page]
 <img width="1919" height="938" alt="Screenshot 2025-11-20 230454" src="https://github.com/user-attachments/assets/bbebe9ef-cd77-4fec-b275-afd49e80dfcc" />
 
 > *A modern, high-performance landing page that sets the stage for the simulation.*
@@ -41,8 +40,8 @@ We didn't just build another tutorial site. We built a simulation.
 ### 1. Gamified Progress Tracking
 Ditch the boring checklists. Your journey is visualized as a 3D path. Track your stats, earn achievements for mastering complex concepts, and see exactly how far you've come on the road to Git mastery.
 
-![Mission Control & Roadmap](<img width="1919" height="937" alt="Screenshot 2025-11-20 230641" src="https://github.com/user-attachments/assets/49f65f1a-698e-4ecc-b298-6f9545e446a8" />
-)
+<img width="1919" height="937" alt="Screenshot 2025-11-20 230641" src="https://github.com/user-attachments/assets/49f65f1a-698e-4ecc-b298-6f9545e446a8" />
+
 
 ### 2. The Interactive Workspace
 This is where the magic happens. We combine three distinct layers into one seamless experience:
@@ -50,8 +49,8 @@ This is where the magic happens. We combine three distinct layers into one seaml
 2.  **The Visualizer (Center):** A real-time view of your repository state (currently showing the "System Offline" state before initialization).
 3.  **The Terminal (Right):** A functional terminal emulator where you type real Git commands to drive the simulation.
 
-![Interactive Workspace](<img width="1919" height="942" alt="Screenshot 2025-11-20 230733" src="https://github.com/user-attachments/assets/8e7ef1fd-73c0-4bee-a1c7-9facbaa0360a" />
-)
+<img width="1919" height="942" alt="Screenshot 2025-11-20 230733" src="https://github.com/user-attachments/assets/8e7ef1fd-73c0-4bee-a1c7-9facbaa0360a" />
+
 
 ---
 
