@@ -27,8 +27,9 @@ Let’s be real—staring at a black-and-white terminal trying to visualize a `g
 From **"I deleted main by accident"** (Level 1) to **"I rewrite history for fun"** (Level 3) — we got you.
 
 ### 📸 The Landing Zone
-![Landing Page](<img width="1919" height="938" alt="Screenshot 2025-11-20 230454" src="https://github.com/user-attachments/assets/bbebe9ef-cd77-4fec-b275-afd49e80dfcc" />
-)
+![Landing Page]
+<img width="1919" height="938" alt="Screenshot 2025-11-20 230454" src="https://github.com/user-attachments/assets/bbebe9ef-cd77-4fec-b275-afd49e80dfcc" />
+
 > *A modern, high-performance landing page that sets the stage for the simulation.*
 
 ---
