@@ -32,7 +32,9 @@ From **"I deleted main by accident"** (Level 1) to **"I rewrite history for fun"
 
 | **The Landing** | **The Curriculum** |
 |:---:|:---:|
-| ![Landing](https://placehold.co/400x200/1a1a1a/FFF?text=Landing+Page+Glassmorphism) | ![Curriculum](https://placehold.co/400x200/1a1a1a/FFF?text=Interactive+Map) |
+| ![Landing](<img width="1919" height="938" alt="Screenshot 2025-11-20 230454" src="https://github.com/user-attachments/assets/0589f814-29a7-4722-9c18-31f7d475156c" />
+) | ![Curriculum](<img width="1919" height="937" alt="Screenshot 2025-11-20 230641" src="https://github.com/user-attachments/assets/c23f2582-6fb7-45b6-aa27-368b310b17c0" />
+) |
 | *Animated 3D Shaders & Glassmorphism* | *Gamified Progress Tracking* |
 
 > Workspace
