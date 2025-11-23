@@ -6,8 +6,8 @@
 ![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Three.js](https://img.shields.io/badge/Three.js-black?style=for-the-badge&logo=three.js&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
 ![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=for-the-badge&logo=vercel)
+![Status](https://img.shields.io/badge/Status-Bussin-success?style=for-the-badge)
 
 <br />
 
@@ -18,60 +18,61 @@
 
 ---
 
-## 💅 The Vibe Check (What is this?)
+## 🛸 The Vibe Check (What is this?)
 
-Let’s be real—staring at a terminal trying to visualize a `git rebase` is absolute torture. 
+Let’s be real—staring at a black-and-white terminal trying to visualize a `git rebase` is torture.
 
-**GitJourney** is a gamified, interactive platform that turns the boring command line into a **visual 3D experience**. We visualize the Git DAG (Directed Acyclic Graph) in real-time, helping you build a mental model of branches, commits, and tags.
+**GitJourney** is a gamified, interactive platform that turns the abstract mental model of Git into a **visual 3D experience**. We visualize the Git DAG (Directed Acyclic Graph) in real-time, helping you understand branches, commits, and the dreaded HEAD pointer.
 
 From **"I deleted main by accident"** (Level 1) to **"I rewrite history for fun"** (Level 3) — we got you.
 
----
-
-## 📸 Visuals
-
-| **The Landing** | **The Curriculum** |
-|:---:|:---:|
-| <img width="1919" height="938" alt="Screenshot 2025-11-20 230454" src="https://github.com/user-attachments/assets/0589f814-29a7-4722-9c18-31f7d475156c" /> |
-| (<img width="1919" height="937" alt="Screenshot 2025-11-20 230641" src="https://github.com/user-attachments/assets/c23f2582-6fb7-45b6-aa27-368b310b17c0" /> |
-
-| *Animated 3D Shaders & Glassmorphism* | *Gamified Progress Tracking* |
-
-> Workspace
-> <img width="1919" height="942" alt="Screenshot 2025-11-20 230733" src="https://github.com/user-attachments/assets/4ee1eb31-66fd-49a3-879b-f31f51844c34" />
-
+### 📸 The Landing Zone
+![Landing Page](<img width="1919" height="938" alt="Screenshot 2025-11-20 230454" src="https://github.com/user-attachments/assets/bbebe9ef-cd77-4fec-b275-afd49e80dfcc" />
+)
+> *A modern, high-performance landing page that sets the stage for the simulation.*
 
 ---
 
-## 🔥 Why It Slaps (Features)
+## 🔥 Why It Slaps (Key Features)
 
-* **Main Character Energy:** You aren't just typing; you're moving through a 3D Canvas seeing your repo update in real-time.
-* **23+ Interactive Levels:** From `git init` to `git cherry-pick`.
-* **Visual Git Canvas:** See branches diverge and merge visually.
-* **Sandbox Mode:** A free-play zone to experiment (and break things) without consequences.
-* **Gamified:** Earn badges, track time, and unlock achievements.
+We didn't just build another tutorial site. We built a simulation.
+
+### 1. Gamified Progress Tracking
+Ditch the boring checklists. Your journey is visualized as a 3D path. Track your stats, earn achievements for mastering complex concepts, and see exactly how far you've come on the road to Git mastery.
+
+![Mission Control & Roadmap](<img width="1919" height="937" alt="Screenshot 2025-11-20 230641" src="https://github.com/user-attachments/assets/49f65f1a-698e-4ecc-b298-6f9545e446a8" />
+)
+
+### 2. The Interactive Workspace
+This is where the magic happens. We combine three distinct layers into one seamless experience:
+1.  **The Guide (Left):** Clear, step-by-step instructions and theory.
+2.  **The Visualizer (Center):** A real-time view of your repository state (currently showing the "System Offline" state before initialization).
+3.  **The Terminal (Right):** A functional terminal emulator where you type real Git commands to drive the simulation.
+
+![Interactive Workspace](<img width="1919" height="942" alt="Screenshot 2025-11-20 230733" src="https://github.com/user-attachments/assets/8e7ef1fd-73c0-4bee-a1c7-9facbaa0360a" />
+)
 
 ---
 
 ## 🏎️ The Flex (Engineering & Optimization)
 
-Most 3D websites turn your laptop into a jet engine. **Not this one.** We engineered this to be **production-ready**. 
+Most 3D websites turn your laptop into a jet engine and kill mobile batteries. **Not this one.**
 
-Here is the technical wizardry used to keep it hitting **60FPS on mobile**:
+We engineered GitJourney with a "Performance-First" mindset to ensure it hits **60FPS on mobile devices**. Here is the technical wizardry under the hood:
 
 ### ⚡ Hybrid Rendering Stack
-We use a **Hybrid Stack**—HTML for the UI/Text and WebGL *only* for the 3D assets. It keeps the DOM light and the GPU happy.
+We don't dump everything into the 3D Canvas. We use a **Hybrid Stack**—HTML for the UI/Text and WebGL *only* for the 3D assets. This keeps the DOM accessible and the GPU focused only on what matters.
 
 ### 🔋 Battery Saver Mode (`frameloop="demand"`)
-We implemented on-demand rendering. The GPU literally sleeps when you are reading the guide or typing. Your phone battery will thank us later.
+A learning platform is mostly static while you read. We implemented **on-demand rendering**. The GPU literally sleeps when you aren't interacting with the 3D scene.
 
 ### 📱 Mobile Scaling (DPR Clamping)
-Retina screens usually kill WebGL performance (rendering 3x pixels).
-* **The Fix:** We clamped the DPR (Device Pixel Ratio) to `1.5` on mobile.
-* **The Result:** Crispy visuals, zero lag, looks native.
+Retina screens try to render at 3x resolution, which kills mobile GPUs.
+* **The Fix:** We actively clamp the Device Pixel Ratio (DPR) to a maximum of `1.5` on mobile.
+* **The Result:** Crispy visuals, zero lag, and it feels native.
 
-### 🎨 Custom Shaders
-The background isn't a video—it's a mathematical shader (`ColorBends.tsx`) running on the GPU, creating smooth, non-repetitive visuals without heavy asset downloads.
+### 🧩 Geometry Instancing
+We don't render 100 separate items in the background. We use **GPU Instancing** to render repeated geometry in a **single draw call**, massively reducing CPU overhead.
 
 ---
 
@@ -83,26 +84,8 @@ The background isn't a video—it's a mathematical shader (`ColorBends.tsx`) run
 | **Build Tool** | Vite 6.2 |
 | **3D Engine** | Three.js + React Three Fiber |
 | **Styling** | Tailwind CSS (Glassmorphism) |
-| **Icons** | Lucide React |
-| **Logic** | Custom Git Simulation Engine (`gitLogic.ts`) |
-
----
-
-## 🎓 Curriculum Breakdown
-
-<details>
-<summary>Click to see full lesson list</summary>
-
-1.  **Introduction to Git** - Basic concepts
-2.  **Initializing** - `git init`
-3.  **Committing** - `git add` & `git commit`
-4.  **History** - `git log`
-5.  **Branching** - `git branch` & `checkout`
-6.  **Merging** - `git merge`
-7.  **Remote** - `git push` & `pull`
-8.  **Advanced:** Stashing, Tagging, Rebasing, Cherry-picking, Resetting, and Reverting.
-
-</details>
+| **State** | React Hooks + Custom Context |
+| **Simulation** | Custom Git Logic Engine (`gitLogic.ts`) |
 
 ---
 
@@ -119,35 +102,12 @@ cd GitJourney---Interactive-Git-learning-platform
 
 # 3. Install the goods
 npm install 
+# or
+yarn install
 
 # 4. Start the engine
 npm run dev
-Open http://localhost:3000 and watch the magic happen.
-
-📁 Project Structure
-Bash
-
-gitjourney/
-├── components/          # React components
-│   ├── ColorBends.tsx   # ✨ Custom 3D Shaders
-│   ├── GitCanvas.tsx    # 🧠 The Visualization Logic
-│   └── ...
-├── utils/               # Logic Layer
-│   ├── gitLogic.ts      # ⚙️ The Simulation Engine
-│   └── lessonGuides.ts
-└── App.tsx              # Main Entry
-🤝 Contributing
-See a bug? That's kinda cringe. Fix it and submit a PR!
-
-Fork the repository
-
-Create your feature branch (git checkout -b feature/AmazingFeature)
-
-Commit your changes (git commit -m 'Add some AmazingFeature')
-
-Push to the branch (git push origin feature/AmazingFeature)
-
-Open a Pull Request
+Open http://localhost:3000 and enter the simulation.
 
 <div align="center">
 
