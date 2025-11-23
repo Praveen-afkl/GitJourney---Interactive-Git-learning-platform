@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Terminal, GitBranch, ChevronRight, Star, Users, Sun, Moon, Gamepad2, Cpu, Trophy, Shield, LogIn, UserPlus, BookOpen, Clock, Code } from 'lucide-react';
 import { Logo } from './Logo';
 import { signUp, signIn, getCurrentUser } from '../utils/auth';
@@ -17,6 +17,31 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
   const [isSignUp, setIsSignUp] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const currentUser = getCurrentUser();
+
+  // Detect mobile device for performance optimizations - updates on resize
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  });
+
+  // Update mobile detection on window resize
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+    };
+
+    // Check on mount and resize
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    // Also check on orientation change (for mobile devices)
+    window.addEventListener('orientationchange', checkMobile);
+
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+      window.removeEventListener('orientationchange', checkMobile);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,14 +86,15 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
   return (
     <div className="flex flex-col min-h-screen relative z-10 overflow-y-auto hide-scrollbar text-slate-800 dark:text-slate-200 transition-colors duration-500 p-4" style={{ fontFamily: "'Josefin Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif" }}>
       
-      {/* ColorBends Background - Interactive with cursor */}
+      {/* ColorBends Background - Optimized for mobile */}
       <div className="fixed inset-0 z-0" style={{ width: '100vw', height: '100vh' }}>
-        <ColorBends
-          className="w-full h-full"
-          style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 1 }}
-          colors={useMemo(() => isDarkMode 
-            ? ['#3b82f6', '#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'] 
-            : ['#60a5fa', '#818cf8', '#22d3ee', '#34d399', '#fbbf24', '#f472b6'], [isDarkMode])}
+        {!isMobile && (
+          <ColorBends
+            className="w-full h-full"
+            style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 1 }}
+            colors={useMemo(() => isDarkMode 
+              ? ['#3b82f6', '#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'] 
+              : ['#60a5fa', '#818cf8', '#22d3ee', '#34d399', '#fbbf24', '#f472b6'], [isDarkMode])}
             transparent={true}
             speed={0.12}
             scale={1.2}
@@ -78,15 +104,28 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
             parallax={0.4}
             noise={0.08}
             autoRotate={1.5}
-        />
-        {/* Liquid Glass Blur Overlay - Optimized Single Layer */}
+          />
+        )}
+        {/* Mobile: Simple gradient background instead of WebGL */}
+        {isMobile && (
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: isDarkMode
+                ? 'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.12) 0%, transparent 50%), linear-gradient(135deg, rgba(5, 11, 20, 0.95) 0%, rgba(15, 23, 42, 0.9) 100%)'
+                : 'radial-gradient(circle at 20% 50%, rgba(96, 165, 250, 0.2) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(129, 140, 248, 0.15) 0%, transparent 50%), linear-gradient(135deg, rgba(248, 250, 252, 0.95) 0%, rgba(241, 245, 249, 0.9) 100%)',
+              zIndex: 1
+            }}
+          />
+        )}
+        {/* Liquid Glass Blur Overlay - Reduced on mobile */}
         <div 
           className="absolute inset-0" 
           style={{ 
             zIndex: 2,
-            backdropFilter: 'blur(6px) saturate(140%)',
-            WebkitBackdropFilter: 'blur(6px) saturate(140%)',
-            willChange: 'transform',
+            backdropFilter: isMobile ? 'blur(2px) saturate(120%)' : 'blur(6px) saturate(140%)',
+            WebkitBackdropFilter: isMobile ? 'blur(2px) saturate(120%)' : 'blur(6px) saturate(140%)',
+            willChange: isMobile ? 'auto' : 'transform',
             transform: 'translateZ(0)',
             background: isDarkMode 
               ? 'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 50%), linear-gradient(135deg, rgba(5, 11, 20, 0.55) 0%, rgba(15, 23, 42, 0.45) 100%), linear-gradient(180deg, rgba(59, 130, 246, 0.015) 0%, transparent 30%, transparent 70%, rgba(99, 102, 241, 0.015) 100%)'
@@ -96,7 +135,7 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
       </div>
 
       {/* HUD Navigation */}
-      <nav className="relative z-50 flex items-center justify-between px-5 py-3 border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md rounded-2xl mx-4 mt-2 animate-fade-in-up" style={{ opacity: 0 }}>
+      <nav className={`relative z-50 flex items-center justify-between px-5 py-3 border border-slate-200 dark:border-white/10 ${isMobile ? 'bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-sm' : 'bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md'} rounded-2xl mx-4 mt-2 animate-fade-in-up`} style={{ opacity: 0 }}>
         <div className="flex items-center gap-4 select-none group cursor-pointer">
           <div className="relative">
               <Logo className="rounded-xl rotate-0 scale-90 border-2 border-indigo-500" />
@@ -148,12 +187,12 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
                     className="animate-fade-in-up inline-block" 
                     style={isDarkMode ? {
                         color: '#ffffff',
-                        textShadow: '0 0 6px rgba(255, 255, 255, 0.4), 0 0 12px rgba(255, 255, 255, 0.3), 0 0 18px rgba(255, 255, 255, 0.2)',
-                        filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))'
+                        textShadow: isMobile ? '0 0 3px rgba(255, 255, 255, 0.3)' : '0 0 6px rgba(255, 255, 255, 0.4), 0 0 12px rgba(255, 255, 255, 0.3), 0 0 18px rgba(255, 255, 255, 0.2)',
+                        filter: isMobile ? 'none' : 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.3))'
                     } : {
                         color: '#1e293b',
-                        textShadow: '0 0 3px rgba(30, 41, 59, 0.3), 0 0 6px rgba(30, 41, 59, 0.2)',
-                        filter: 'drop-shadow(0 0 4px rgba(30, 41, 59, 0.25))'
+                        textShadow: isMobile ? '0 0 2px rgba(30, 41, 59, 0.2)' : '0 0 3px rgba(30, 41, 59, 0.3), 0 0 6px rgba(30, 41, 59, 0.2)',
+                        filter: isMobile ? 'none' : 'drop-shadow(0 0 4px rgba(30, 41, 59, 0.25))'
                     }}
                 >
                     Level Up Your
@@ -169,10 +208,12 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
                         WebkitTextFillColor: 'transparent',
                         backgroundClip: 'text',
                         color: 'transparent',
-                        animation: 'fadeInUp 0.8s ease-out 0.3s forwards, gradient-flow 5s linear infinite 1.1s',
-                        filter: isDarkMode 
-                            ? 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.4)) drop-shadow(0 0 16px rgba(251, 146, 60, 0.35)) drop-shadow(0 0 24px rgba(251, 191, 36, 0.3)) drop-shadow(0 0 32px rgba(252, 211, 77, 0.2))'
-                            : 'drop-shadow(0 0 4px rgba(234, 88, 12, 0.3)) drop-shadow(0 0 8px rgba(249, 115, 22, 0.25)) drop-shadow(0 0 12px rgba(245, 158, 11, 0.2)) drop-shadow(0 0 16px rgba(234, 179, 8, 0.15))',
+                        animation: isMobile ? 'fadeInUp 0.8s ease-out 0.3s forwards' : 'fadeInUp 0.8s ease-out 0.3s forwards, gradient-flow 5s linear infinite 1.1s',
+                        filter: isMobile 
+                            ? (isDarkMode ? 'drop-shadow(0 0 4px rgba(249, 115, 22, 0.3))' : 'drop-shadow(0 0 2px rgba(234, 88, 12, 0.2))')
+                            : (isDarkMode 
+                                ? 'drop-shadow(0 0 8px rgba(249, 115, 22, 0.4)) drop-shadow(0 0 16px rgba(251, 146, 60, 0.35)) drop-shadow(0 0 24px rgba(251, 191, 36, 0.3)) drop-shadow(0 0 32px rgba(252, 211, 77, 0.2))'
+                                : 'drop-shadow(0 0 4px rgba(234, 88, 12, 0.3)) drop-shadow(0 0 8px rgba(249, 115, 22, 0.25)) drop-shadow(0 0 12px rgba(245, 158, 11, 0.2)) drop-shadow(0 0 16px rgba(234, 179, 8, 0.15))'),
                         display: 'inline-block',
                         opacity: 0,
                         position: 'relative',
@@ -200,16 +241,16 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
             <div className="absolute -top-12 -right-12 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl animate-pulse"></div>
             <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl animate-pulse delay-75"></div>
             
-            {/* Card Container - Glass Effect */}
+            {/* Card Container - Glass Effect - Optimized for mobile */}
             <div 
-                className="relative overflow-hidden backdrop-blur-2xl border border-slate-300/50 dark:border-indigo-500/30 p-1 shadow-2xl transform transition-transform duration-500 hover:scale-[1.02] rounded-3xl"
+                className={`relative overflow-hidden border border-slate-300/50 dark:border-indigo-500/30 p-1 shadow-2xl transform transition-transform duration-500 ${isMobile ? '' : 'hover:scale-[1.02]'} rounded-3xl`}
                 style={{
                     background: isDarkMode
-                        ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(30, 41, 59, 0.3) 100%)'
-                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.5) 100%)',
-                    backdropFilter: 'blur(30px) saturate(150%)',
-                    WebkitBackdropFilter: 'blur(30px) saturate(150%)',
-                    willChange: 'transform',
+                        ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.6) 0%, rgba(30, 41, 59, 0.5) 100%)'
+                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 250, 252, 0.7) 100%)',
+                    backdropFilter: isMobile ? 'blur(8px) saturate(120%)' : 'blur(30px) saturate(150%)',
+                    WebkitBackdropFilter: isMobile ? 'blur(8px) saturate(120%)' : 'blur(30px) saturate(150%)',
+                    willChange: isMobile ? 'auto' : 'transform',
                     transform: 'translateZ(0)',
                     boxShadow: isDarkMode
                         ? '0 8px 32px 0 rgba(99, 102, 241, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.1)'
@@ -231,11 +272,11 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
                     className="relative p-5 h-full rounded-[20px]"
                     style={{
                         background: isDarkMode
-                            ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.3) 0%, rgba(30, 41, 59, 0.2) 100%)'
-                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(248, 250, 252, 0.3) 100%)',
-                        backdropFilter: 'blur(8px)',
-                        WebkitBackdropFilter: 'blur(8px)',
-                        willChange: 'transform',
+                            ? 'linear-gradient(135deg, rgba(15, 23, 42, 0.5) 0%, rgba(30, 41, 59, 0.4) 100%)'
+                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(248, 250, 252, 0.5) 100%)',
+                        backdropFilter: isMobile ? 'blur(4px)' : 'blur(8px)',
+                        WebkitBackdropFilter: isMobile ? 'blur(4px)' : 'blur(8px)',
+                        willChange: isMobile ? 'auto' : 'transform',
                         transform: 'translateZ(0)'
                     }}
                 >
@@ -260,10 +301,10 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
                         className="flex gap-1.5 mb-4 p-0.5 rounded-lg"
                         style={{
                             background: isDarkMode
-                                ? 'rgba(30, 41, 59, 0.4)'
-                                : 'rgba(241, 245, 249, 0.6)',
-                            backdropFilter: 'blur(10px)',
-                            WebkitBackdropFilter: 'blur(10px)',
+                                ? 'rgba(30, 41, 59, 0.5)'
+                                : 'rgba(241, 245, 249, 0.7)',
+                            backdropFilter: isMobile ? 'blur(4px)' : 'blur(10px)',
+                            WebkitBackdropFilter: isMobile ? 'blur(4px)' : 'blur(10px)',
                             border: `1px solid ${isDarkMode ? 'rgba(99, 102, 241, 0.2)' : 'rgba(148, 163, 184, 0.3)'}`
                         }}
                     >
@@ -312,17 +353,17 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
                                         setEmail(e.target.value);
                                         setError(null);
                                     }}
-                                    className={`w-full px-3 py-2 text-slate-900 dark:text-white font-mono text-sm focus:ring-0 outline-none transition-all placeholder-slate-400 rounded-lg backdrop-blur-sm ${
+                                    className={`w-full px-3 py-2 text-slate-900 dark:text-white font-mono text-sm focus:ring-0 outline-none transition-all placeholder-slate-400 rounded-lg ${isMobile ? '' : 'backdrop-blur-sm'} ${
                                         error
                                             ? 'border-2 border-red-500 dark:border-red-500'
                                             : 'border-2 border-slate-200/50 dark:border-slate-700/50 focus:border-indigo-500 dark:focus:border-indigo-400'
                                     }`}
                                     style={{
                                         background: isDarkMode
-                                            ? 'rgba(30, 41, 59, 0.4)'
-                                            : 'rgba(255, 255, 255, 0.5)',
-                                        backdropFilter: 'blur(10px)',
-                                        WebkitBackdropFilter: 'blur(10px)'
+                                            ? 'rgba(30, 41, 59, 0.6)'
+                                            : 'rgba(255, 255, 255, 0.7)',
+                                        backdropFilter: isMobile ? 'none' : 'blur(10px)',
+                                        WebkitBackdropFilter: isMobile ? 'none' : 'blur(10px)'
                                     }}
                                     placeholder="pilot@base.com"
                                 />
@@ -349,13 +390,13 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
                                             setAvatarName(e.target.value);
                                             setError(null);
                                         }}
-                                        className="w-full border-2 border-slate-200/50 dark:border-slate-700/50 focus:border-indigo-500 dark:focus:border-indigo-400 px-3 py-2 text-slate-900 dark:text-white font-mono text-sm focus:ring-0 outline-none transition-all placeholder-slate-400 rounded-lg backdrop-blur-sm"
+                                        className={`w-full border-2 border-slate-200/50 dark:border-slate-700/50 focus:border-indigo-500 dark:focus:border-indigo-400 px-3 py-2 text-slate-900 dark:text-white font-mono text-sm focus:ring-0 outline-none transition-all placeholder-slate-400 rounded-lg ${isMobile ? '' : 'backdrop-blur-sm'}`}
                                         style={{
                                             background: isDarkMode
-                                                ? 'rgba(30, 41, 59, 0.4)'
-                                                : 'rgba(255, 255, 255, 0.5)',
-                                            backdropFilter: 'blur(10px)',
-                                            WebkitBackdropFilter: 'blur(10px)'
+                                                ? 'rgba(30, 41, 59, 0.6)'
+                                                : 'rgba(255, 255, 255, 0.7)',
+                                            backdropFilter: isMobile ? 'none' : 'blur(10px)',
+                                            WebkitBackdropFilter: isMobile ? 'none' : 'blur(10px)'
                                         }}
                                         placeholder="Your display name"
                                         maxLength={20}

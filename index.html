@@ -464,6 +464,29 @@
       .pulse-glow {
         animation: pulse-glow 2s ease-in-out infinite;
       }
+
+      /* Mobile Performance Optimizations */
+      @media (max-width: 768px) {
+        /* Reduce complex animations on mobile */
+        .animate-fade-in-up,
+        .animate-fade-in-up-delay {
+          animation: fadeInUp 0.4s ease-out forwards !important;
+        }
+        
+        /* Disable gradient flow animation on mobile for better performance */
+        @keyframes gradient-flow-mobile {
+          0%, 100% { background-position: 0% center; }
+        }
+      }
+      
+      /* Respect user's motion preferences */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
       
       /* Sketch Style Borders - Hand-drawn effect */
       .sketch-border {
