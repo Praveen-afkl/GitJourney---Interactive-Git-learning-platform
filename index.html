@@ -75,28 +75,73 @@
         background: #6366f1;
       }
       
+      /* Hide workspace/sandbox scrollbar on mobile */
+      @media (max-width: 768px) {
+        .workspace-scrollbar-mobile::-webkit-scrollbar {
+          display: none;
+          width: 0;
+          height: 0;
+        }
+        .workspace-scrollbar-mobile {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      }
+      
       /* Guide Panel Scrollbar - Thinner and Optimized */
       .guide-panel-scrollbar::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
       }
       .guide-panel-scrollbar::-webkit-scrollbar-track {
         background: transparent;
       }
       .guide-panel-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(203, 213, 225, 0.5);
-        border-radius: 3px;
+        background: rgba(203, 213, 225, 0.6);
+        border-radius: 4px;
         border: 1px solid transparent;
         background-clip: padding-box;
+        min-height: 40px; /* Minimum touch target on mobile */
       }
       .dark .guide-panel-scrollbar::-webkit-scrollbar-thumb {
-        background: rgba(79, 70, 229, 0.5);
+        background: rgba(79, 70, 229, 0.6);
       }
       .guide-panel-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(148, 163, 184, 0.7);
+        background: rgba(148, 163, 184, 0.8);
       }
       .dark .guide-panel-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: rgba(99, 102, 241, 0.7);
+        background: rgba(99, 102, 241, 0.8);
+      }
+      /* Mobile-specific scrollbar improvements */
+      @media (max-width: 768px) {
+        .guide-panel-scrollbar::-webkit-scrollbar {
+          width: 10px;
+          height: 10px;
+        }
+        .guide-panel-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(203, 213, 225, 0.8);
+          min-height: 50px;
+        }
+        .dark .guide-panel-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(79, 70, 229, 0.8);
+        }
+      }
+      /* Fallback for Firefox */
+      .guide-panel-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(203, 213, 225, 0.6) transparent;
+      }
+      .dark .guide-panel-scrollbar {
+        scrollbar-color: rgba(79, 70, 229, 0.6) transparent;
+      }
+      @media (max-width: 768px) {
+        .guide-panel-scrollbar {
+          scrollbar-width: auto;
+          scrollbar-color: rgba(203, 213, 225, 0.8) transparent;
+        }
+        .dark .guide-panel-scrollbar {
+          scrollbar-color: rgba(79, 70, 229, 0.8) transparent;
+        }
       }
       
       /* Canvas Liquid Glass Scrollbar */

@@ -67,7 +67,12 @@ export const GuidePanel: React.FC<GuidePanelProps> = memo(({ lesson, isComplete,
   // Restore scroll position after render if lesson hasn't changed
   useLayoutEffect(() => {
     if (scrollContainerRef.current && previousLessonIdRef.current === lesson.id && scrollPositionRef.current > 0) {
-      scrollContainerRef.current.scrollTop = scrollPositionRef.current;
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = scrollPositionRef.current;
+        }
+      });
     }
   });
 
@@ -119,14 +124,44 @@ export const GuidePanel: React.FC<GuidePanelProps> = memo(({ lesson, isComplete,
     
     container.addEventListener('scroll', handleScroll, { passive: true });
     
-    const resizeObserver = new ResizeObserver(() => handleScroll());
+    const resizeObserver = new ResizeObserver(() => {
+      // Restore scroll position after resize
+      if (container && scrollPositionRef.current > 0) {
+        requestAnimationFrame(() => {
+          if (container) {
+            container.scrollTop = scrollPositionRef.current;
+          }
+        });
+      }
+      handleScroll();
+    });
     resizeObserver.observe(container);
     
     return () => {
       container.removeEventListener('scroll', handleScroll);
       resizeObserver.disconnect();
     };
-  }, [lesson.id]); 
+  }, [lesson.id]);
+  
+  // EFFECT 3: Preserve scroll position on any re-render (including parent state changes)
+  useEffect(() => {
+    // Restore scroll position after any re-render if lesson hasn't changed
+    if (scrollContainerRef.current && previousLessonIdRef.current === lesson.id && scrollPositionRef.current > 0) {
+      const savedPosition = scrollPositionRef.current;
+      // Use multiple attempts to ensure scroll position is restored
+      requestAnimationFrame(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = savedPosition;
+          // Double-check after a short delay (for async updates)
+          setTimeout(() => {
+            if (scrollContainerRef.current && scrollContainerRef.current.scrollTop !== savedPosition) {
+              scrollContainerRef.current.scrollTop = savedPosition;
+            }
+          }, 10);
+        }
+      });
+    }
+  }); // Run on every render to preserve scroll position 
   
   return (
     <div className="flex flex-col h-full min-h-0 relative overflow-hidden bg-slate-50 dark:bg-slate-900">
@@ -153,7 +188,11 @@ export const GuidePanel: React.FC<GuidePanelProps> = memo(({ lesson, isComplete,
       <div 
         ref={scrollContainerRef}
         className="flex-1 min-h-0 overflow-y-auto guide-panel-scrollbar px-3 md:px-5 pb-3 md:pb-4 space-y-3 md:space-y-4 pt-3 md:pt-4" 
-        style={{ overscrollBehavior: 'contain' }}
+        style={{ 
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
+          scrollbarGutter: 'stable' // Prevent layout shift
+        }}
       >
         
         {/* Main Explanation */}
@@ -207,12 +246,27 @@ export const GuidePanel: React.FC<GuidePanelProps> = memo(({ lesson, isComplete,
                     {/* Mobile Auto-Execute Button for Examples */}
                     {onCommand && isMobile && (
                       <button
-                        onClick={() => {
-                          if (onCommand && example.command) {
-                            onCommand(example.command);
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          // Save scroll position before executing command
+                          if (scrollContainerRef.current) {
+                            scrollPositionRef.current = scrollContainerRef.current.scrollTop;
                           }
+                          // Execute command after a small delay to ensure scroll is saved
+                          requestAnimationFrame(() => {
+                            if (onCommand && example.command) {
+                              onCommand(example.command);
+                            }
+                            // Restore scroll position after command execution
+                            setTimeout(() => {
+                              if (scrollContainerRef.current) {
+                                scrollContainerRef.current.scrollTop = scrollPositionRef.current;
+                              }
+                            }, 0);
+                          });
                         }}
-                        className="mt-1.5 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1.5 px-2 rounded transition-all flex items-center justify-center gap-1.5"
+                        className="mt-1.5 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-bold py-1.5 px-2 rounded transition-all flex items-center justify-center gap-1.5 active:scale-95"
                       >
                         <Terminal size={12} />
                         <span>Run</span>
@@ -278,12 +332,27 @@ export const GuidePanel: React.FC<GuidePanelProps> = memo(({ lesson, isComplete,
                         {/* Mobile Auto-Execute Button */}
                         {onCommand && isMobile && (
                             <button
-                                onClick={() => {
-                                    if (onCommand && lesson.hint) {
-                                        onCommand(lesson.hint);
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    // Save scroll position before executing command
+                                    if (scrollContainerRef.current) {
+                                        scrollPositionRef.current = scrollContainerRef.current.scrollTop;
                                     }
+                                    // Execute command after a small delay to ensure scroll is saved
+                                    requestAnimationFrame(() => {
+                                        if (onCommand && lesson.hint) {
+                                            onCommand(lesson.hint);
+                                        }
+                                        // Restore scroll position after command execution
+                                        setTimeout(() => {
+                                            if (scrollContainerRef.current) {
+                                                scrollContainerRef.current.scrollTop = scrollPositionRef.current;
+                                            }
+                                        }, 0);
+                                    });
                                 }}
-                                className="mt-2 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-3 rounded transition-all flex items-center justify-center gap-2"
+                                className="mt-2 w-full bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-3 rounded transition-all flex items-center justify-center gap-2 active:scale-95"
                             >
                                 <Terminal size={14} />
                                 <span>Run Command</span>

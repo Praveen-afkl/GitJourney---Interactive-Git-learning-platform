@@ -206,19 +206,14 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
   };
 
   const handleFinish = () => {
-    // Only mark as completed if it was the first time (auto-show)
-    // Don't mark if user manually opened it
-    if (currentStep === 0) {
-      localStorage.setItem('gitjourney-guide-completed', 'true');
-    }
+    // Always mark as completed when user finishes the tour
+    localStorage.setItem('gitjourney-guide-completed', 'true');
     onClose();
   };
 
   const handleSkip = () => {
-    // Only mark as completed if it was the first time (auto-show)
-    if (currentStep === 0) {
-      localStorage.setItem('gitjourney-guide-completed', 'true');
-    }
+    // Always mark as completed when user skips the tour
+    localStorage.setItem('gitjourney-guide-completed', 'true');
     onClose();
   };
 

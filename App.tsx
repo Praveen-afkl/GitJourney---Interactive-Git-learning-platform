@@ -111,15 +111,20 @@ export default function App() {
     const hasCompletedGuide = localStorage.getItem('gitjourney-guide-completed') === 'true';
     const user = getCurrentUser();
     
-    // Only trigger if guide is not already open and not completed
+    // Only trigger if guide is not already open, not completed, and view is valid
+    // Remove showFeatureGuide from dependencies to prevent re-triggering
     if (user && !hasCompletedGuide && !showFeatureGuide && (view === 'curriculum' || view === 'workspace')) {
       // Small delay to ensure DOM is ready
       const timer = setTimeout(() => {
-        setShowFeatureGuide(true);
+        // Double-check guide hasn't been completed or opened in the meantime
+        const stillNotCompleted = localStorage.getItem('gitjourney-guide-completed') !== 'true';
+        if (stillNotCompleted) {
+          setShowFeatureGuide(true);
+        }
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [view, showFeatureGuide]);
+  }, [view]); // Removed showFeatureGuide from dependencies
 
   // Save dark mode preference
   useEffect(() => {
@@ -473,7 +478,14 @@ export default function App() {
         <Suspense fallback={null}>
           <FeatureGuide 
             isOpen={showFeatureGuide} 
-            onClose={() => setShowFeatureGuide(false)} 
+            onClose={() => {
+              setShowFeatureGuide(false);
+              // Ensure guide completion is marked when closed
+              // This prevents re-triggering if user closes without finishing
+              if (localStorage.getItem('gitjourney-guide-completed') !== 'true') {
+                localStorage.setItem('gitjourney-guide-completed', 'true');
+              }
+            }} 
             view={view === 'curriculum' ? 'curriculum' : 'workspace'}
             isDarkMode={isDarkMode}
           />
@@ -759,7 +771,7 @@ export default function App() {
         </header>
 
         {/* Main Game Grid - Floating Panels */}
-        <main className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 md:gap-4 overflow-y-auto overflow-x-hidden p-2 md:p-0 md:overflow-hidden">
+        <main className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 md:gap-4 overflow-y-auto overflow-x-hidden p-2 md:p-0 md:overflow-hidden workspace-scrollbar-mobile">
             
             {/* Left: Quest Log */}
             <div className="md:col-span-1 lg:col-span-4 flex flex-col min-w-0 h-full min-h-[400px] md:min-h-0">
