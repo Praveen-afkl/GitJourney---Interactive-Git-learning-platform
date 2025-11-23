@@ -2,7 +2,7 @@ export interface Commit {
   id: string;
   message: string;
   parentId: string | null;
-  secondParentId: string | null; // For merges
+  secondParentId: string | null;
   timestamp: number;
   author: string;
 }
@@ -23,7 +23,7 @@ export interface GitState {
   tags: Tag[];
   head: {
     type: 'branch' | 'commit';
-    ref: string; // Branch name or Commit ID
+    ref: string;
   };
 }
 
@@ -48,11 +48,11 @@ export interface GraphLink {
 
 export interface Lesson {
   id: string;
-  section: string; // Grouping category
+  section: string;
   title: string;
   description: string;
-  task: string; // The challenge text
-  hint: string; // Command hint
-  initialState: GitState; // State to load when lesson starts
+  task: string;
+  hint: string;
+  initialState: GitState;
   checkSuccess: (state: GitState) => boolean;
 }

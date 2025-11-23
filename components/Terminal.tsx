@@ -30,15 +30,15 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
     }
   }, [logs]);
 
-  // Keyboard shortcuts
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+K to focus terminal
+
       if (e.ctrlKey && e.key === 'k') {
         e.preventDefault();
         inputRef.current?.focus();
       }
-      // Esc to close suggestions
+
       if (e.key === 'Escape') {
         setSuggestions([]);
         inputRef.current?.focus();
@@ -49,11 +49,11 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Autocomplete suggestions
+
   useEffect(() => {
     if (input.trim().length > 0 && input.startsWith('git ')) {
       const query = input.toLowerCase();
-      const matches = GIT_COMMANDS.filter(cmd => 
+      const matches = GIT_COMMANDS.filter(cmd =>
         cmd.toLowerCase().includes(query) || cmd.toLowerCase().startsWith(query)
       ).slice(0, 5);
       setSuggestions(matches);
@@ -69,7 +69,7 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Arrow up - command history
+
     if (e.key === 'ArrowUp' && commandHistory.length > 0) {
       e.preventDefault();
       const newIndex = historyIndex === -1 ? commandHistory.length - 1 : Math.max(0, historyIndex - 1);
@@ -77,7 +77,7 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
       setInput(commandHistory[newIndex]);
       setSuggestions([]);
     }
-    // Arrow down - command history
+
     else if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (historyIndex >= 0) {
@@ -91,13 +91,13 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
         }
       }
     }
-    // Tab - autocomplete
+
     else if (e.key === 'Tab' && suggestions.length > 0) {
       e.preventDefault();
       setInput(suggestions[selectedSuggestion]);
       setSuggestions([]);
     }
-    // Arrow keys in suggestions
+
     else if (e.key === 'ArrowUp' && suggestions.length > 0) {
       e.preventDefault();
       setSelectedSuggestion(prev => Math.max(0, prev - 1));
@@ -118,7 +118,7 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
   };
 
   const handleContainerClick = () => {
-      inputRef.current?.focus();
+    inputRef.current?.focus();
   }
 
   const selectSuggestion = (suggestion: string) => {
@@ -128,12 +128,12 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
   };
 
   return (
-    <div 
-        className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 font-mono text-sm relative overflow-hidden group min-h-0"
-        onClick={handleContainerClick}
-        data-terminal
+    <div
+      className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 font-mono text-sm relative overflow-hidden group min-h-0"
+      onClick={handleContainerClick}
+      data-terminal
     >
-      {/* Header Bar */}
+
       <div className="flex items-center justify-between px-3 md:px-4 py-1.5 md:py-2 bg-slate-200/50 dark:bg-slate-900/50 backdrop-blur-sm border-b border-slate-300 dark:border-slate-700/50 select-none z-10">
         <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold tracking-widest uppercase">
           <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-red-500/50"></div>
@@ -142,42 +142,41 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
           <span className="ml-1.5 md:ml-2 text-slate-500">terminal</span>
         </div>
         <div className="flex items-center gap-1.5 md:gap-2 opacity-30 text-slate-400">
-            <Cpu className="w-3 h-3 md:w-[14px] md:h-[14px]" />
+          <Cpu className="w-3 h-3 md:w-[14px] md:h-[14px]" />
         </div>
       </div>
 
-      {/* Terminal Body */}
-      <div 
+
+      <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-3 md:p-4 space-y-2 cursor-text relative z-0 custom-scrollbar"
       >
-        {/* Welcome Message */}
+
         <div className="text-slate-600 dark:text-slate-400 mb-4 text-xs leading-relaxed border-l-2 border-indigo-500/30 dark:border-indigo-500/30 pl-3">
-          <span className="text-indigo-600 dark:text-indigo-400 font-bold">GitJourney OS v2.4.0</span><br/>
+          <span className="text-indigo-600 dark:text-indigo-400 font-bold">GitJourney OS v2.4.0</span><br />
           Ready for input. Type <span className="text-cyan-600 dark:text-cyan-300">help</span> for commands.
         </div>
 
         {logs.map((log) => (
-          <div key={log.id} className={`break-words leading-relaxed ${
-            log.type === 'command' ? 'flex items-start gap-2 mt-3 text-slate-900 dark:text-slate-100 font-bold' :
-            log.type === 'error' ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 p-2 rounded border-l-2 border-red-500/50 dark:border-red-500/50 my-1' :
-            log.type === 'success' ? 'text-emerald-600 dark:text-emerald-400' :
-            'text-slate-600 dark:text-slate-400'
-          }`}>
+          <div key={log.id} className={`break-words leading-relaxed ${log.type === 'command' ? 'flex items-start gap-2 mt-3 text-slate-900 dark:text-slate-100 font-bold' :
+              log.type === 'error' ? 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 p-2 rounded border-l-2 border-red-500/50 dark:border-red-500/50 my-1' :
+                log.type === 'success' ? 'text-emerald-600 dark:text-emerald-400' :
+                  'text-slate-600 dark:text-slate-400'
+            }`}>
             {log.type === 'command' ? (
-                <>
-                    <ChevronRight size={14} className="mt-[4px] text-pink-600 dark:text-pink-500 shrink-0" />
-                    <span>{log.text}</span>
-                </>
+              <>
+                <ChevronRight size={14} className="mt-[4px] text-pink-600 dark:text-pink-500 shrink-0" />
+                <span>{log.text}</span>
+              </>
             ) : log.text}
           </div>
         ))}
-        
-        {/* Active Input Line */}
+
+
         <form onSubmit={handleSubmit} className="flex items-center gap-2 mt-3 group relative">
-            <div className="text-pink-600 dark:text-pink-500 animate-pulse font-bold">
-                <ChevronRight size={16} />
-            </div>
+          <div className="text-pink-600 dark:text-pink-500 animate-pulse font-bold">
+            <ChevronRight size={16} />
+          </div>
           <div className="flex-1 relative">
             <input
               ref={inputRef}
@@ -190,10 +189,10 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
               autoComplete="off"
               spellCheck={false}
             />
-            
-            {/* Autocomplete Suggestions */}
+
+
             {suggestions.length > 0 && (
-              <div 
+              <div
                 ref={suggestionsRef}
                 className="absolute bottom-full mb-2 w-full bg-slate-800 border border-slate-700 rounded-lg shadow-2xl overflow-hidden z-50"
               >
@@ -201,11 +200,10 @@ export const Terminal: React.FC<TerminalProps> = ({ logs, onCommand, commandHist
                   <div
                     key={idx}
                     onClick={() => selectSuggestion(suggestion)}
-                    className={`px-3 py-2 cursor-pointer font-mono text-sm transition-colors ${
-                      idx === selectedSuggestion
+                    className={`px-3 py-2 cursor-pointer font-mono text-sm transition-colors ${idx === selectedSuggestion
                         ? 'bg-indigo-600 text-white'
                         : 'text-slate-300 hover:bg-slate-700'
-                    }`}
+                      }`}
                   >
                     {suggestion}
                   </div>

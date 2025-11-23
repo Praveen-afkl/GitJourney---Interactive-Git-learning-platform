@@ -32,7 +32,7 @@ uniform int uTransparent;
 uniform float uScale;
 uniform float uFrequency;
 uniform float uWarpStrength;
-uniform vec2 uPointer; // in NDC [-1,1]
+uniform vec2 uPointer;
 uniform float uMouseInfluence;
 uniform float uParallax;
 uniform float uNoise;
@@ -62,8 +62,8 @@ void main() {
             vec2 r = sin(1.5 * (s.yx * uFrequency) + 2.0 * cos(s * uFrequency));
             float m0 = length(r + sin(5.0 * r.y * uFrequency - 3.0 * t + float(i)) / 4.0);
             float kBelow = clamp(uWarpStrength, 0.0, 1.0);
-            float kMix = pow(kBelow, 0.3); // strong response across 0..1
-            float gain = 1.0 + max(uWarpStrength - 1.0, 0.0); // allow >1 to amplify displacement
+            float kMix = pow(kBelow, 0.3);
+            float gain = 1.0 + max(uWarpStrength - 1.0, 0.0);
             vec2 disp = (r - s) * kBelow;
             vec2 warped = s + disp * gain;
             float m1 = length(warped + sin(5.0 * warped.y * uFrequency - 3.0 * t + float(i)) / 4.0);
@@ -139,13 +139,13 @@ export default function ColorBends({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    
+
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const geometry = new THREE.PlaneGeometry(2, 2);
     const uColorsArray = Array.from({ length: MAX_COLORS }, () => new THREE.Vector3(0, 0, 0));
-    
-    // Initialize colors immediately if provided
+
+
     const toVec3 = (hex: string) => {
       const h = hex.replace('#', '').trim();
       const v =
@@ -154,7 +154,7 @@ export default function ColorBends({
           : [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
       return new THREE.Vector3(v[0] / 255, v[1] / 255, v[2] / 255);
     };
-    
+
     const initialColors = (colors || []).filter(Boolean).slice(0, MAX_COLORS).map(toVec3);
     for (let i = 0; i < MAX_COLORS; i++) {
       if (i < initialColors.length) {
@@ -327,10 +327,10 @@ export default function ColorBends({
   }, []);
 
   return (
-    <div 
-      ref={containerRef} 
-      className={`w-full h-full relative overflow-hidden ${className || ''}`} 
-      style={{ width: '100%', height: '100%', ...style }} 
+    <div
+      ref={containerRef}
+      className={`w-full h-full relative overflow-hidden ${className || ''}`}
+      style={{ width: '100%', height: '100%', ...style }}
     />
   );
 }

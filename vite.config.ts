@@ -19,7 +19,7 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Vendor chunks
+
           if (id.includes('node_modules')) {
             if (id.includes('react') || id.includes('react-dom')) {
               return 'react-vendor';
@@ -33,10 +33,10 @@ export default defineConfig({
             if (id.includes('uuid')) {
               return 'utils-vendor';
             }
-            // Other node_modules
+
             return 'vendor';
           }
-          // Component chunks for code splitting
+
           if (id.includes('components/CurriculumView')) {
             return 'curriculum';
           }
@@ -56,6 +56,6 @@ export default defineConfig({
       },
     },
     chunkSizeWarningLimit: 1000,
-    minify: 'esbuild', // Use esbuild (faster, built-in) instead of terser
+    minify: 'esbuild',
   },
 });

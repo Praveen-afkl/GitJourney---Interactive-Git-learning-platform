@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { X, ArrowRight, ArrowLeft, HelpCircle, Map, Terminal, BookOpen, GitBranch, Keyboard, Trophy, Target, CheckCircle2, Sparkles } from 'lucide-react';
 
 interface GuideStep {
   id: string;
   title: string;
   description: string;
-  target?: string; // CSS selector for element to highlight
+  target?: string;
   position?: 'top' | 'bottom' | 'left' | 'right' | 'center';
   icon: React.ReactNode;
 }
@@ -127,26 +127,42 @@ const WORKSPACE_STEPS: GuideStep[] = [
 export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, view, isDarkMode = false }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [highlightedElement, setHighlightedElement] = useState<HTMLElement | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
-  const wasOpenRef = useRef(false); // Track if guide was previously open
-  const initialStepRef = useRef(0); // Track initial step when guide opens
+  const wasOpenRef = useRef(false);
+  const initialStepRef = useRef(0);
 
-  const steps = view === 'curriculum' ? CURRICULUM_STEPS : WORKSPACE_STEPS;
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+
+  const steps = useMemo(() => {
+    const allSteps = view === 'curriculum' ? CURRICULUM_STEPS : WORKSPACE_STEPS;
+    if (!isMobile) return allSteps;
+
+    return allSteps.filter(s => s.id !== 'terminal');
+  }, [view, isMobile]);
+
   const step = steps[currentStep];
 
-  // Handle guide open/close state - preserve step when guide stays open
+
   useEffect(() => {
     if (!isOpen) {
-      // Only reset when guide is actually closed
+
       if (wasOpenRef.current) {
         setCurrentStep(0);
         setHighlightedElement(null);
       }
       wasOpenRef.current = false;
     } else {
-      // Guide is opening or staying open
+
       if (!wasOpenRef.current) {
-        // First time opening - start from step 0
+
         setCurrentStep(0);
         initialStepRef.current = 0;
       }
@@ -154,28 +170,27 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
     }
   }, [isOpen]);
 
-  // Handle step changes and element highlighting - separate effect
+
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen || !step) {
       return;
     }
 
-    // Wait for DOM to be ready - increased timeout for better reliability
+
     const timer = setTimeout(() => {
       if (step.target) {
-        // Try multiple times to find the element
+
         const findElement = (attempts = 0): void => {
           const element = document.querySelector(step.target!) as HTMLElement;
           if (element) {
             setHighlightedElement(element);
-            // Only scroll if element is visible
+
             try {
               element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } catch (e) {
-              // Ignore scroll errors
+
             }
-          } else if (attempts < 5) {
-            // Retry if element not found (up to 5 times with 200ms delay)
+
             setTimeout(() => findElement(attempts + 1), 200);
           } else {
             setHighlightedElement(null);
@@ -206,20 +221,20 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
   };
 
   const handleFinish = () => {
-    // Always mark as completed when user finishes the tour
+
     localStorage.setItem('gitjourney-guide-completed', 'true');
     onClose();
   };
 
   const handleSkip = () => {
-    // Always mark as completed when user skips the tour
+
     localStorage.setItem('gitjourney-guide-completed', 'true');
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !step) return null;
 
-  // Calculate tooltip position - near the focused element, avoiding overlap
+
   const getTooltipPosition = () => {
     if (!highlightedElement || step.position === 'center') {
       return {
@@ -230,90 +245,114 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
     }
 
     const rect = highlightedElement.getBoundingClientRect();
-    const isMobile = window.innerWidth < 768;
     const tooltipWidth = isMobile ? Math.min(280, window.innerWidth - 40) : 320;
     const tooltipHeight = isMobile ? 180 : 220;
-    const spacing = isMobile ? 12 : 16; // Closer spacing on mobile
+    const spacing = isMobile ? 12 : 16;
 
     let top = 0;
     let left = 0;
     let transform = '';
 
-    switch (step.position) {
-      case 'top':
-        top = rect.top - tooltipHeight - spacing;
-        left = rect.left + (rect.width / 2);
-        transform = 'translateX(-50%)';
-        break;
-      case 'bottom':
-        top = rect.bottom + spacing;
-        left = rect.left + (rect.width / 2);
-        transform = 'translateX(-50%)';
-        break;
-      case 'left':
-        top = rect.top + (rect.height / 2);
-        left = rect.left - tooltipWidth - spacing;
-        transform = 'translateY(-50%)';
-        break;
-      case 'right':
-        top = rect.top + (rect.height / 2);
-        left = rect.right + spacing;
-        transform = 'translateY(-50%)';
-        break;
-    }
+    if (isMobile) {
 
-    // Keep tooltip within viewport with padding
-    const padding = 20;
-    const maxTop = window.innerHeight - tooltipHeight - padding;
-    const maxLeft = window.innerWidth - tooltipWidth - padding;
-    
-    // For left position, check if there's enough space on the left
-    if (step.position === 'left') {
-      const spaceOnLeft = rect.left - padding;
-      const spaceOnRight = window.innerWidth - rect.right - padding;
-      
-      // If not enough space on left but enough on right, move to right
-      if (spaceOnLeft < tooltipWidth + spacing && spaceOnRight >= tooltipWidth + spacing) {
-        left = rect.right + spacing;
-        transform = 'translateY(-50%)';
+      const centerY = window.innerHeight / 2;
+      const elementCenterY = rect.top + (rect.height / 2);
+
+
+      left = window.innerWidth / 2;
+      transform = 'translateX(-50%)';
+
+      if (elementCenterY > centerY) {
+
+        top = rect.top - tooltipHeight - spacing;
+
+        if (top < 10) top = 10;
       } else {
-        // Try to keep on left, adjust if needed
-        left = Math.max(padding, rect.left - tooltipWidth - spacing);
-        transform = 'translateY(-50%)';
+
+        top = rect.bottom + spacing;
+
+        if (top + tooltipHeight > window.innerHeight - 10) {
+          top = window.innerHeight - tooltipHeight - 10;
+        }
       }
-      top = Math.max(padding, Math.min(top, maxTop));
-    } else if (step.position === 'right') {
-      const spaceOnRight = window.innerWidth - rect.right - padding;
-      const spaceOnLeft = rect.left - padding;
-      
-      // If not enough space on right but enough on left, move to left
-      if (spaceOnRight < tooltipWidth + spacing && spaceOnLeft >= tooltipWidth + spacing) {
-        left = rect.left - tooltipWidth - spacing;
-        transform = 'translateY(-50%)';
-      } else {
-        left = Math.min(maxLeft, rect.right + spacing);
-        transform = 'translateY(-50%)';
-      }
-      top = Math.max(padding, Math.min(top, maxTop));
     } else {
-      // For top/bottom, use standard positioning
-      top = Math.max(padding, Math.min(top, maxTop));
-      left = Math.max(padding, Math.min(left, maxLeft));
-      
-      // If tooltip would overlap, adjust position
-      if (step.position === 'bottom' && top < rect.bottom + spacing) {
-        // Move to top instead
-        top = rect.top - tooltipHeight - spacing;
-        transform = 'translateX(-50%)';
-      } else if (step.position === 'top' && top + tooltipHeight > rect.top - spacing) {
-        // Move to bottom instead
-        top = rect.bottom + spacing;
-        transform = 'translateX(-50%)';
+
+      switch (step.position) {
+        case 'top':
+          top = rect.top - tooltipHeight - spacing;
+          left = rect.left + (rect.width / 2);
+          transform = 'translateX(-50%)';
+          break;
+        case 'bottom':
+          top = rect.bottom + spacing;
+          left = rect.left + (rect.width / 2);
+          transform = 'translateX(-50%)';
+          break;
+        case 'left':
+          top = rect.top + (rect.height / 2);
+          left = rect.left - tooltipWidth - spacing;
+          transform = 'translateY(-50%)';
+          break;
+        case 'right':
+          top = rect.top + (rect.height / 2);
+          left = rect.right + spacing;
+          transform = 'translateY(-50%)';
+          break;
+      }
+
+
+      const padding = 20;
+      const maxTop = window.innerHeight - tooltipHeight - padding;
+      const maxLeft = window.innerWidth - tooltipWidth - padding;
+
+
+      if (step.position === 'left') {
+        const spaceOnLeft = rect.left - padding;
+        const spaceOnRight = window.innerWidth - rect.right - padding;
+
+
+        if (spaceOnLeft < tooltipWidth + spacing && spaceOnRight >= tooltipWidth + spacing) {
+          left = rect.right + spacing;
+          transform = 'translateY(-50%)';
+        } else {
+
+          left = Math.max(padding, rect.left - tooltipWidth - spacing);
+          transform = 'translateY(-50%)';
+        }
+        top = Math.max(padding, Math.min(top, maxTop));
+      } else if (step.position === 'right') {
+        const spaceOnRight = window.innerWidth - rect.right - padding;
+        const spaceOnLeft = rect.left - padding;
+
+
+        if (spaceOnRight < tooltipWidth + spacing && spaceOnLeft >= tooltipWidth + spacing) {
+          left = rect.left - tooltipWidth - spacing;
+          transform = 'translateY(-50%)';
+        } else {
+          left = Math.min(maxLeft, rect.right + spacing);
+          transform = 'translateY(-50%)';
+        }
+        top = Math.max(padding, Math.min(top, maxTop));
+      } else {
+
+        top = Math.max(padding, Math.min(top, maxTop));
+        left = Math.max(padding, Math.min(left, maxLeft));
+
+
+        if (step.position === 'bottom' && top < rect.bottom + spacing) {
+
+          top = rect.top - tooltipHeight - spacing;
+          transform = 'translateX(-50%)';
+        } else if (step.position === 'top' && top + tooltipHeight > rect.top - spacing) {
+
+          top = rect.bottom + spacing;
+          transform = 'translateX(-50%)';
+        }
       }
     }
 
-    return { 
-      top: `${top}px`, 
+    return {
+      top: `${top}px`,
       left: `${left}px`,
       transform: transform || undefined
     };
@@ -323,20 +362,20 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
 
   return (
     <>
-      {/* Overlay with highlight - no blur on focused area */}
+
       <div
         ref={overlayRef}
         className="fixed inset-0 z-[9998] pointer-events-auto"
         onClick={handleNext}
       >
-        {/* Dark overlay with smart blur - no blur on highlighted area */}
+
         {highlightedElement && highlightedElement.getBoundingClientRect ? (() => {
           const rect = highlightedElement.getBoundingClientRect();
           const padding = 12;
           return (
             <>
-              {/* Top dark area */}
-              <div 
+
+              <div
                 className="absolute bg-black/75 backdrop-blur-sm"
                 style={{
                   top: 0,
@@ -345,8 +384,8 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
                   height: `${Math.max(0, rect.top - padding)}px`,
                 }}
               />
-              {/* Bottom dark area */}
-              <div 
+
+              <div
                 className="absolute bg-black/75 backdrop-blur-sm"
                 style={{
                   top: `${rect.bottom + padding}px`,
@@ -355,8 +394,8 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
                   bottom: 0,
                 }}
               />
-              {/* Left dark area */}
-              <div 
+
+              <div
                 className="absolute bg-black/75 backdrop-blur-sm"
                 style={{
                   top: `${Math.max(0, rect.top - padding)}px`,
@@ -365,8 +404,8 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
                   height: `${rect.height + (padding * 2)}px`,
                 }}
               />
-              {/* Right dark area */}
-              <div 
+
+              <div
                 className="absolute bg-black/75 backdrop-blur-sm"
                 style={{
                   top: `${Math.max(0, rect.top - padding)}px`,
@@ -375,7 +414,7 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
                   height: `${rect.height + (padding * 2)}px`,
                 }}
               />
-              {/* Clear highlight area - NO blur, sharp and clear */}
+
               <div
                 className="absolute pointer-events-none"
                 style={{
@@ -397,14 +436,14 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
         )}
       </div>
 
-      {/* Tooltip */}
+
       <div
         className="fixed z-[9999] pointer-events-auto"
         style={tooltipStyle}
       >
         <div className="bg-white dark:bg-slate-900 rounded-xl md:rounded-2xl shadow-2xl border-2 border-indigo-500/30 p-4 md:p-6 w-[280px] md:w-80 max-w-[calc(100vw-20px)] animate-in zoom-in-95 duration-300 relative">
-          {/* Arrow pointing to focused element */}
-          {highlightedElement && step.position !== 'center' && (
+
+          {highlightedElement && step.position !== 'center' && !isMobile && (
             <div
               className="absolute w-0 h-0 border-8 border-transparent pointer-events-none z-10"
               style={{
@@ -435,7 +474,7 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
               }}
             />
           )}
-          {/* Header */}
+
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg text-indigo-600 dark:text-indigo-400">
@@ -458,12 +497,12 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
             </button>
           </div>
 
-          {/* Description */}
+
           <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-6">
             {step.description}
           </p>
 
-          {/* Progress bar */}
+
           <div className="mb-4">
             <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
               <div
@@ -473,7 +512,7 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
             </div>
           </div>
 
-          {/* Actions */}
+
           <div className="flex items-center justify-between gap-3">
             <button
               onClick={handlePrevious}
@@ -483,7 +522,7 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
               <ArrowLeft size={16} />
               Previous
             </button>
-            
+
             {currentStep < steps.length - 1 ? (
               <button
                 onClick={handleNext}
