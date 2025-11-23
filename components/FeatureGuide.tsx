@@ -171,27 +171,36 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
   }, [isOpen]);
 
 
+  // Ref to track the recursive timeout so we can clear it on cleanup
+  const recursionTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (!isOpen || !step) {
       return;
     }
 
+    // Clear any existing recursive timers when step changes or opens
+    if (recursionTimerRef.current) {
+      clearTimeout(recursionTimerRef.current);
+    }
 
     const timer = setTimeout(() => {
       if (step.target) {
-
         const findElement = (attempts = 0): void => {
           const element = document.querySelector(step.target!) as HTMLElement;
           if (element) {
             setHighlightedElement(element);
 
             try {
+              // Only scroll if it's the first successful find
               element.scrollIntoView({ behavior: 'smooth', block: 'center' });
             } catch (e) {
-
+              // Ignore scroll errors
             }
-
-            setTimeout(() => findElement(attempts + 1), 200);
+            // Stop recursion once found
+          } else if (attempts < 10) {
+            // Retry if not found, up to 10 times
+            recursionTimerRef.current = setTimeout(() => findElement(attempts + 1), 200);
           } else {
             setHighlightedElement(null);
             console.warn(`Guide: Could not find element with selector: ${step.target}`);
@@ -203,7 +212,12 @@ export const FeatureGuide: React.FC<FeatureGuideProps> = ({ isOpen, onClose, vie
       }
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      if (recursionTimerRef.current) {
+        clearTimeout(recursionTimerRef.current);
+      }
+    };
   }, [isOpen, currentStep, step?.target || '']);
 
   const handleNext = () => {
