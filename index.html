@@ -88,6 +88,14 @@
         }
       }
       
+      /* Ensure mobile dropdown menu is always on top */
+      @media (max-width: 768px) {
+        [data-mobile-dropdown] {
+          z-index: 999999 !important;
+          position: fixed !important;
+        }
+      }
+      
       /* Guide Panel Scrollbar - Thinner and Optimized */
       .guide-panel-scrollbar::-webkit-scrollbar {
         width: 8px;

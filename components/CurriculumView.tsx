@@ -1217,7 +1217,7 @@ export const CurriculumView: React.FC<CurriculumViewProps> = ({
                                     style={{
                                         left: '50%',
                                         transform: 'translateX(-50%) translateY(0.5rem)',
-                                        zIndex: 10001,
+                                        zIndex: window.innerWidth < 768 ? 1000 : 10001, // Lower z-index on mobile to allow dropdown to appear above
                                         pointerEvents: isActive ? 'auto' : 'none',
                                     }}
                                     onMouseEnter={(e) => {

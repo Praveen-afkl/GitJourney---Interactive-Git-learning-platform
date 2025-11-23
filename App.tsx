@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
+import { createPortal } from 'react-dom';
 import { GitCanvas } from './components/GitCanvas';
 import { Terminal } from './components/Terminal';
 import { GuidePanel } from './components/GuidePanel';
@@ -500,7 +501,7 @@ export default function App() {
       <div className="flex flex-col h-full p-4 gap-4 max-w-[1920px] mx-auto w-full overflow-hidden">
         
         {/* Header - Consistent Navbar */}
-        <header className="h-16 md:h-20 flex items-center justify-between px-2 sm:px-3 md:px-6 lg:px-10 shrink-0 sticky top-2 z-50 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-xl md:rounded-2xl mx-2 md:mx-4 relative min-w-0 overflow-visible">
+        <header className="h-16 md:h-20 flex items-center justify-between px-2 sm:px-3 md:px-6 lg:px-10 shrink-0 sticky top-2 z-[9998] bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-xl md:rounded-2xl mx-2 md:mx-4 relative min-w-0 overflow-visible">
                 <div className="flex items-center gap-2 md:gap-3">
                 <div className="relative cursor-pointer group" onClick={() => setView('curriculum')}>
                     <Logo className="w-8 h-8 md:w-12 md:h-12 relative z-10" />
@@ -623,10 +624,27 @@ export default function App() {
                     {showMobileMenu ? <X size={18} /> : <Menu size={18} />}
                  </button>
             </div>
+        </header>
 
-                 {/* Mobile Dropdown Menu */}
-                 {showMobileMenu && (
-                   <div className="absolute top-full left-0 right-0 mt-2 mx-2 md:hidden bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl z-[100] overflow-visible">
+        {/* Mobile Dropdown Menu - Rendered via Portal to ensure it's above everything */}
+        {showMobileMenu && createPortal(
+          <>
+            {/* Backdrop to prevent interaction with elements behind */}
+            <div 
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm md:hidden"
+              style={{ zIndex: 999998 }}
+              onClick={() => setShowMobileMenu(false)}
+            />
+            <div 
+              data-mobile-dropdown
+              className="fixed top-20 left-2 right-2 md:hidden bg-white/95 dark:bg-[#0f172a]/95 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-xl shadow-2xl overflow-visible" 
+              style={{ 
+                maxHeight: 'calc(100vh - 6rem)',
+                zIndex: 999999,
+                position: 'fixed',
+                isolation: 'isolate' // Create new stacking context
+              }}
+            >
                      <div className="p-4 space-y-2 max-h-[80vh] overflow-y-auto">
                        {/* Progress for Mobile */}
                        {currentLessonIdx !== -1 ? (
@@ -767,8 +785,9 @@ export default function App() {
                        </div>
                      </div>
                    </div>
-                 )}
-        </header>
+          </>,
+          document.body
+        )}
 
         {/* Main Game Grid - Floating Panels */}
         <main className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 md:gap-4 overflow-y-auto overflow-x-hidden p-2 md:p-0 md:overflow-hidden workspace-scrollbar-mobile">
