@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import { Terminal, GitBranch, ChevronRight, Star, Users, Sun, Moon, Gamepad2, Cpu, Trophy, Shield, LogIn, UserPlus, BookOpen, Clock, Code } from 'lucide-react';
 import { Logo } from './Logo';
 import { signUp, signIn, getCurrentUser } from '../utils/auth';
@@ -76,8 +76,13 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
     }
   };
 
+  // Memoize colors array to avoid recreating on every render
+  const colorBendsColors = useMemo(() => isDarkMode 
+    ? ['#3b82f6', '#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'] 
+    : ['#60a5fa', '#818cf8', '#22d3ee', '#34d399', '#fbbf24', '#f472b6'], [isDarkMode]);
+
   // Auto-login if user is already logged in
-  React.useEffect(() => {
+  useEffect(() => {
     if (currentUser) {
       onLogin();
     }
@@ -92,9 +97,7 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
           <ColorBends
             className="w-full h-full"
             style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 1 }}
-            colors={useMemo(() => isDarkMode 
-              ? ['#3b82f6', '#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'] 
-              : ['#60a5fa', '#818cf8', '#22d3ee', '#34d399', '#fbbf24', '#f472b6'], [isDarkMode])}
+            colors={colorBendsColors}
             transparent={true}
             speed={0.12}
             scale={1.2}
@@ -450,34 +453,36 @@ const LandingPageComponent: React.FC<LandingPageProps> = ({ onLogin, isDarkMode,
         </div>
       </main>
 
-      {/* Footer / Modules */}
-      <div className="relative z-10 py-12 animate-fade-in-up-delay" style={{ opacity: 0 }}>
-          <div className="max-w-7xl mx-auto px-6">
-              <h4 className="text-center text-sm font-bold uppercase tracking-[0.2em] text-slate-400 mb-8">
-                  System Modules Installed
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                  <ModuleCard 
-                    title="Visual Cortex" 
-                    subtitle="Real-time Graph Engine"
-                    icon={<GitBranch className="text-pink-400" />}
-                    color="pink"
-                  />
-                  <ModuleCard 
-                    title="Command Link" 
-                    subtitle="Terminal Simulator"
-                    icon={<Terminal className="text-emerald-400" />}
-                    color="emerald"
-                  />
-                  <ModuleCard 
-                    title="Mission Log" 
-                    subtitle="23 Campaign Levels"
-                    icon={<Shield className="text-amber-400" />}
-                    color="amber"
-                  />
-              </div>
-          </div>
-      </div>
+      {/* Footer / Modules - Hidden on mobile */}
+      {!isMobile && (
+        <div className="relative z-10 py-12 animate-fade-in-up-delay" style={{ opacity: 0 }}>
+            <div className="max-w-7xl mx-auto px-6">
+                <h4 className="text-center text-sm font-bold uppercase tracking-[0.2em] text-slate-400 mb-8">
+                    System Modules Installed
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <ModuleCard 
+                      title="Visual Cortex" 
+                      subtitle="Real-time Graph Engine"
+                      icon={<GitBranch className="text-pink-400" />}
+                      color="pink"
+                    />
+                    <ModuleCard 
+                      title="Command Link" 
+                      subtitle="Terminal Simulator"
+                      icon={<Terminal className="text-emerald-400" />}
+                      color="emerald"
+                    />
+                    <ModuleCard 
+                      title="Mission Log" 
+                      subtitle="23 Campaign Levels"
+                      icon={<Shield className="text-amber-400" />}
+                      color="amber"
+                    />
+                </div>
+            </div>
+        </div>
+      )}
     </div>
   );
 };
